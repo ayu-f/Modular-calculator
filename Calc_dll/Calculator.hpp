@@ -42,5 +42,15 @@ private:
 	double calculate();
 public:
 	void Run(const std::string& plugPath);
+
+	~Calculator() {
+		for (auto dll : libs) {
+			FreeLibrary(dll);
+		}
+		free(operations["+"]);
+		free(operations["-"]);
+		free(operations["*"]);
+		free(operations["/"]);
+	}
 };
 
