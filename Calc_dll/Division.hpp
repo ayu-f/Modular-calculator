@@ -9,11 +9,11 @@ public:
 		prior = priority::mid;
 	}
 
-	virtual double calculate(std::vector<double> num) override {
+	double calculate(const std::vector<double>& num) override {
 		if (num.size() != 2)
-			throw std::exception("Error: Invalid input");
+			throw std::exception("Error! Invalid input: Division operator can have only two input parameters.");
 
-		return num.at(0) - num.at(1);
+		return num.at(0) / num.at(1);
 	}
 
 	~Division() = default;

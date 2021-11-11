@@ -25,7 +25,7 @@ public:
 	virtual ~BaseOperation() = default;
 
 
-	virtual double calculate(std::vector<double>) = 0;
+	virtual double calculate(const std::vector<double>&) = 0;
 
 	priority GetPriority() {
 		return prior;

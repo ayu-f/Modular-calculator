@@ -9,9 +9,9 @@ public:
 		prior = priority::high;
 	}
 
-	virtual double calculate(std::vector<double> num) override {
+	double calculate(const std::vector<double>& num) override {
 		if (num.size() != 1)
-			throw std::exception("Error: Invalid input");
+			throw std::exception("Error! Invalid input: Factorial can have only one input parameter.");
 
 		if (num[0] == 0 || num[0] == 1)
 			return 1;

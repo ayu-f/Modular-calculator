@@ -9,9 +9,9 @@ public:
 		prior = priority::high;
 	}
 
-	virtual double calculate(std::vector<double> num) override {
+	double calculate(const std::vector<double>& num) override {
 		if (num.size() != 2)
-			throw std::exception("Error: Invalid input");
+			throw std::exception("Error! Invalid input: Exponentiation of a number operator can have only two input parameters.");
 
 		return pow(num[0], num[1]);
 	}

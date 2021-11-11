@@ -9,9 +9,9 @@ public:
 		prior = priority::low;
 	}
 	
-	virtual double calculate(std::vector<double> num) override {
+	double calculate(const std::vector<double>& num) override {
 		if (num.size() != 2)
-			throw std::exception("Error: Invalid input");
+			throw std::exception("Error! Invalid input: Addition operator can have only two input parameters.");
 
 		return num.at(0) + num.at(1);
 	}

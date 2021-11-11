@@ -39,25 +39,25 @@ void Calculator::GetExpression() {
 		throw std::exception("Error: Empty input");
 }
 
-bool Calculator::IsOper(std::string token) {
+bool Calculator::IsOper(const std::string& token) {
 	return operations.find(token) != operations.end();
 }
 
-bool Calculator::IsOperPrefix(std::string token) {
+bool Calculator::IsOperPrefix(const std::string& token) {
 	auto tmp = operations.find(token);
 	if (tmp == operations.end())
 		return false;
 	return tmp->second->GetType() == BaseOperation::operType::prefix;
 }
 
-bool Calculator::IsOperPostfix(std::string token) {
+bool Calculator::IsOperPostfix(const std::string& token) {
 	auto tmp = operations.find(token);
 	if (tmp == operations.end())
 		return false;
 	return tmp->second->GetType() == BaseOperation::operType::postfix;
 }
 
-bool Calculator::IsOperBinary(std::string token) {
+bool Calculator::IsOperBinary(const std::string& token) {
 	auto tmp = operations.find(token);
 	if (tmp == operations.end())
 		return false;
@@ -65,46 +65,65 @@ bool Calculator::IsOperBinary(std::string token) {
 }
 
 // true - if arg1 >= arg2
-bool Calculator::notLowerPrior(std::string str1, std::string str2) {
+bool Calculator::notLowerPrior(const std::string& str1, const std::string& str2) {
 	auto tmp1 = operations.find(str1);
 	auto tmp2 = operations.find(str2);
 
 	return tmp1->second->GetPriority() >= tmp2->second->GetPriority();
 }
 
-std::string Calculator::Parse(std::string str, int& i) {
-	std::string token;
-	if (isdigit(str[i])) {
-		while (isdigit(str[i]) || str[i] == '.' && i < str.size()) {
-			token.insert(token.end(), str[i]);
-			i++;
+void Calculator::Parse(std::string& out_token, int& inout_i, const std::string& str) {
+	//std::string token;
+	if (isdigit(str[inout_i])) {
+		while (isdigit(str[inout_i]) || str[inout_i] == '.' && inout_i < str.size()) {
+			out_token.insert(out_token.end(), str[inout_i]);
+			inout_i++;
 		}
 	}
-	else if (str[i] == ')' || str[i] == '(') {
-		token.insert(token.end(), str[i]);
-		i++;
+	else if (str[inout_i] == ')' || str[inout_i] == '(') {
+		out_token.insert(out_token.end(), str[inout_i]);
+		inout_i++;
 	}
 	else {
 		for (auto& strOper : operations) {
-			std::string tmp = str.substr(i, strOper.first.size());
+			std::string tmp = str.substr(inout_i, strOper.first.size());
 			if (tmp.compare(strOper.first) == 0) {
-				i += tmp.size();
-				return tmp;
+				inout_i += tmp.size();
+				out_token =  tmp;
+				return;
 			}
 		}
 		//if not found valid symbol
-		token = str[i];
+		out_token = str[inout_i];
 	}
-	return token;
+}
+
+void Calculator::HandleClosingParenthesis() {
+	if (!stack.empty())
+		while (stack.top() != "(") {
+			polish.push_back(stack.top());
+			stack.pop();
+		}
+	stack.pop();
+}
+
+void Calculator::HandleBinaryOperation(const std::string& token) {
+	while (!stack.empty() && IsOper(stack.top()) && (IsOperPrefix(stack.top()) || notLowerPrior(stack.top(), token))) {
+		polish.push_back(stack.top());
+		stack.pop();
+	}
+	stack.push(token);
 }
 
 void Calculator::ToPolishNotation() {
 	for (int i = 0; i < expression.size();) {
-		if (std::isspace(expression[i])){
+		// just space - go to next char
+		if (std::isspace(expression[i])){ 
 			i++;
 			continue;
 		}
-		auto token = Parse(expression, i); // parse one token (number/operation/bracket)
+		std::string token;
+		Parse(token, i, expression); // parse one token (number/operation/parenthesis)
 		if (isNumber(token) || IsOperPostfix(token)) {
 			polish.push_back(token);
 		}
@@ -113,19 +132,10 @@ void Calculator::ToPolishNotation() {
 			stack.push(token);
 		}
 		else if (token == ")") {
-			if (!stack.empty())
-				while (stack.top() != "(") {
-					polish.push_back(stack.top());
-					stack.pop();
-				}
-			stack.pop();
+			HandleClosingParenthesis();
 		}
 		else if (IsOperBinary(token)) {
-			while (!stack.empty() && IsOper(stack.top()) && (IsOperPrefix(stack.top()) || notLowerPrior(stack.top(), token))) {
-				polish.push_back(stack.top());
-				stack.pop();
-			}
-			stack.push(token);
+			HandleBinaryOperation(token);
 		}
 		else {
 			throw std::exception("Error: Invalid expression input");
@@ -138,7 +148,7 @@ void Calculator::ToPolishNotation() {
 	}
 }
 
-bool Calculator::isNumber(std::string& str) {
+bool Calculator::isNumber(const std::string& str) {
 	if (str.empty() || str == "-")
 		return false;
 

@@ -9,9 +9,9 @@ public:
 		prior = priority::high;
 	}
 
-	virtual double calculate(std::vector<double> num) override {
+	double calculate(const std::vector<double>& num) override {
 		if (num.size() != 1)
-			throw std::exception("Error: Invalid input");
+			throw std::exception("Error! Invalid input: Sinus can have only one input parameter.");
 
 		return sin(num.at(0));
 	}

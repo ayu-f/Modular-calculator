@@ -28,15 +28,17 @@ private:
 	void LoadDll(const std::string& pluginsPath);
 	void GetExpression();
 
-	bool IsOper(std::string token);
-	bool IsOperPrefix(std::string token);
-	bool IsOperPostfix(std::string token);
-	bool IsOperBinary(std::string token);
-	bool isNumber(std::string& str);
+	bool IsOper(const std::string& token);
+	bool IsOperPrefix(const std::string& token);
+	bool IsOperPostfix(const std::string& token);
+	bool IsOperBinary(const std::string& token);
+	bool isNumber(const std::string& str);
 
-	std::string Parse(std::string str, int& i);
+	void Parse(std::string& out_token, int& inout_i, const std::string& str);
 	// true - if arg1 >= arg2
-	bool notLowerPrior(std::string str1, std::string str2);
+	bool notLowerPrior(const std::string& str1, const std::string& str2);
+	void HandleClosingParenthesis();
+	void HandleBinaryOperation(const std::string& token);
 
 	void ToPolishNotation();
 	double calculate();
